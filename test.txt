@@ -1,0 +1,12 @@
+abc I
+dont
+know
+
+
+abc I\n don\0
+
+return abc I\n\0
+		don\0
+	<--
+don\0
+static buffer don\0
