@@ -6,7 +6,7 @@
 /*   By: ajakob <ajakob@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 00:13:53 by ajakob            #+#    #+#             */
-/*   Updated: 2023/01/30 20:24:26 by ajakob           ###   ########.fr       */
+/*   Updated: 2023/05/25 06:15:08 by ajakob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,15 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
-# include <string.h>
 # include <fcntl.h>
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10
+# endif
 
+void			ft_strlcpy(char *dst, const char *src, size_t dstsize);
+char			*ft_strjoin(char *s1, char *s2);
+char			*ft_substr(char *s, unsigned int start, size_t len);
+char			*ft_not_free_substr(char *s, unsigned int start, size_t len);
 char			*get_next_line(int fd);
-void			*ft_calloc(size_t number, size_t size);
-size_t			ft_strlcpy(char *dst, const char *src, size_t dstsize);
-size_t			ft_strlen(const char *s);
-char			*ft_strjoin(char const *s1, char const *s2);
-char			*ft_strchr(const char *s, int c);
-void			ft_bzero(void *s, size_t n);
-void			*ft_memset(void *b, int c, size_t len);
-size_t			ft_strlcat(char *dst, const char *src, size_t dstsize);
-static size_t	ft_strnlen(const char *s, size_t n);
-void			*ft_memcpy(void *dst, const void *src, size_t len);
-char			*ft_strchr(const char *s, int c);
 
 #endif

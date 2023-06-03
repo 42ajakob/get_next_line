@@ -6,74 +6,125 @@
 /*   By: ajakob <ajakob@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 00:13:08 by ajakob            #+#    #+#             */
-/*   Updated: 2023/01/30 20:54:38 by ajakob           ###   ########.fr       */
+/*   Updated: 2023/05/25 06:19:44 by ajakob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*line_alloc(char *buffer, int end) // Somewhere here is the issue
+static int	ft_strchr(const char *s, int c)
 {
-	char		*line;
-	char		*save;
-	char		*n_p;
-	static int	len;
+	char	*str;
+	char	ch;
+	int		i;
 
-	len += end;
-	if (len > end)
+	if (!s)
+		return (-1);
+	str = (char *)s;
+	ch = (char)c;
+	i = 0;
+	while (str[i])
 	{
-		save = ft_calloc(len - end, sizeof(char));
-		ft_strlcpy(save, line, len - end);
-		line = ft_calloc(len, sizeof(char));
-		ft_strlcpy(line, save, len);
-		ft_strlcat(line, buffer, len);
+		if (str[i] == ch)
+			return (i);
+		i++;
 	}
-	else
+	if (str[i] == ch)
+		return (i);
+	return (-1);
+}
+
+void	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+	size_t	i;
+
+	i = 0;
+	if (dstsize != 0)
 	{
-		len += 1;
-		line = ft_calloc(len, sizeof(char));
-		ft_strlcpy(line, buffer, len);
+		while (i < dstsize - 1 && src[i])
+		{
+			dst[i] = src[i];
+			i++;
+		}
+		dst[i] = '\0';
+		i = 0;
 	}
-	if ((n_p = ft_strchr(buffer, '\n')) != buffer[end]) // Maybe buffer '\0' as well
+}
+
+static char	*read_one(int fd, char *temp)
+{
+	char	*buffer;
+	int		r_output;
+
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	r_output = read(fd, buffer, BUFFER_SIZE);
+	buffer[r_output] = '\0';
+	if (r_output < 0)
 	{
-		ft_memcpy(buffer, n_p, end);
-		len = 0;
+		free (temp);
+		temp = NULL;
+		free (buffer);
+		return (NULL);
+	}
+	if (r_output == 0)
+	{
+		free (buffer);
+		return (NULL);
+	}
+	return (buffer);
+}
+
+static char	*line_alloc(int fd, char **temp, char *line)
+{
+	char	*buffer;
+	int		i;
+
+	buffer = read_one(fd, *temp);
+	if (!buffer)
+		return (free(*temp), *temp = NULL, line);
+	i = ft_strchr(buffer, '\n');
+	while (i < 0)
+	{
+		line = ft_strjoin(line, buffer);
+		buffer = read_one(fd, *temp);
+		if (!buffer)
+			return (free(*temp), *temp = NULL, line);
+		i = ft_strchr(buffer, '\n');
+	}
+	if (i >= 0)
+	{
+		line = ft_strjoin(line, ft_not_free_substr(buffer, 0, i + 1));
+		*temp = ft_substr(buffer, i + 1, BUFFER_SIZE - i);
+		buffer = NULL;
 	}
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	buffer[BUFFER_SIZE];
+	static char	*temp;
 	char		*line;
-	int			end;
+	int			i;
 
-
-	if (buffer[0])
-		line = line_alloc(buffer, end);
-	end = read(fd, buffer, BUFFER_SIZE);
-	while (!ft_strchr(buffer, '\n') && end == BUFFER_SIZE)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+		return (free(temp), temp = NULL, NULL);
+	line = NULL;
+	if (temp)
 	{
-		line = line_alloc(buffer, end);
-		end = read(fd, buffer, BUFFER_SIZE);
+		i = ft_strchr(temp, '\n');
+		if (i >= 0)
+		{
+			line = ft_strjoin(line, ft_not_free_substr(temp, 0, i + 1));
+			temp = ft_substr(temp, i + 1, BUFFER_SIZE - i);
+			return (line);
+		}
+		else if (i < 0)
+		{
+			line = ft_strjoin(line, temp);
+			temp = NULL;
+		}
 	}
-	if (ft_strchr(buffer, '\n') || end != BUFFER_SIZE)
-	{
-		line = line_alloc(buffer, end);
-	}
-	return (line);
-}
-
-// Case where allocation fails or input is wrong
-
-int	main(void)
-{
-	int		fd;
-	char	*result;
-
-	fd = open("test.txt", O_RDONLY);
-	result = get_next_line(fd);
-	printf("%s", result);
-	printf("\n");
-	return (0);
+	return (line_alloc(fd, &temp, line));
 }
