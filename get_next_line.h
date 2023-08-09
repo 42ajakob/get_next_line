@@ -6,17 +6,15 @@
 /*   By: ajakob <ajakob@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 00:13:53 by ajakob            #+#    #+#             */
-/*   Updated: 2023/05/25 06:15:08 by ajakob           ###   ########.fr       */
+/*   Updated: 2023/08/09 15:16:43 by ajakob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
-# include <fcntl.h>
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
 # endif
