@@ -6,13 +6,13 @@
 /*   By: ajakob <ajakob@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 00:13:08 by ajakob            #+#    #+#             */
-/*   Updated: 2023/05/25 06:19:44 by ajakob           ###   ########.fr       */
+/*   Updated: 2023/08/09 15:35:37 by ajakob           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int	ft_strchr(const char *s, int c)
+static int	ft_strchr_gnl(const char *s, int c)
 {
 	char	*str;
 	char	ch;
@@ -34,7 +34,7 @@ static int	ft_strchr(const char *s, int c)
 	return (-1);
 }
 
-void	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+void	ft_strlcpy_gnl(char *dst, const char *src, size_t dstsize)
 {
 	size_t	i;
 
@@ -84,19 +84,19 @@ static char	*line_alloc(int fd, char **temp, char *line)
 	buffer = read_one(fd, *temp);
 	if (!buffer)
 		return (free(*temp), *temp = NULL, line);
-	i = ft_strchr(buffer, '\n');
+	i = ft_strchr_gnl(buffer, '\n');
 	while (i < 0)
 	{
-		line = ft_strjoin(line, buffer);
+		line = ft_strjoin_gnl(line, buffer);
 		buffer = read_one(fd, *temp);
 		if (!buffer)
 			return (free(*temp), *temp = NULL, line);
-		i = ft_strchr(buffer, '\n');
+		i = ft_strchr_gnl(buffer, '\n');
 	}
 	if (i >= 0)
 	{
-		line = ft_strjoin(line, ft_not_free_substr(buffer, 0, i + 1));
-		*temp = ft_substr(buffer, i + 1, BUFFER_SIZE - i);
+		line = ft_strjoin_gnl(line, ft_not_free_substr_gnl(buffer, 0, i + 1));
+		*temp = ft_substr_gnl(buffer, i + 1, BUFFER_SIZE - i);
 		buffer = NULL;
 	}
 	return (line);
@@ -113,16 +113,16 @@ char	*get_next_line(int fd)
 	line = NULL;
 	if (temp)
 	{
-		i = ft_strchr(temp, '\n');
+		i = ft_strchr_gnl(temp, '\n');
 		if (i >= 0)
 		{
-			line = ft_strjoin(line, ft_not_free_substr(temp, 0, i + 1));
-			temp = ft_substr(temp, i + 1, BUFFER_SIZE - i);
+			line = ft_strjoin_gnl(line, ft_not_free_substr_gnl(temp, 0, i + 1));
+			temp = ft_substr_gnl(temp, i + 1, BUFFER_SIZE - i);
 			return (line);
 		}
 		else if (i < 0)
 		{
-			line = ft_strjoin(line, temp);
+			line = ft_strjoin_gnl(line, temp);
 			temp = NULL;
 		}
 	}
